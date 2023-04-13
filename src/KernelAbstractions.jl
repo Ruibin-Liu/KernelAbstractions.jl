@@ -451,14 +451,14 @@ struct Kernel{Backend, WorkgroupSize<:_Size, NDRange<:_Size, Fun}
 end
 
 function Base.similar(kernel::Kernel{D, WS, ND}, f::F) where {D, WS, ND, F}
-    Kernel{D, WS, ND, F}(f)
+    Kernel{D, WS, ND, F}(kernel.backend, f)
 end
 
 workgroupsize(::Kernel{D, WorkgroupSize}) where {D, WorkgroupSize} = WorkgroupSize
 ndrange(::Kernel{D, WorkgroupSize, NDRange}) where {D, WorkgroupSize,NDRange} = NDRange
 backend(kernel::Kernel) = kernel.backend
 
-function partition(kernel, ndrange, workgroupsize)
+@inline function partition(kernel, ndrange, workgroupsize)
     static_ndrange = KernelAbstractions.ndrange(kernel)
     static_workgroupsize = KernelAbstractions.workgroupsize(kernel)
 
@@ -592,8 +592,8 @@ SnoopPrecompile.@precompile_all_calls begin
     end
 end
 
-if !isdefined(Base, :get_extension)
+# if !isdefined(Base, :get_extension)
     include("../ext/EnzymeExt.jl")
-end
+# end
 
 end #module
